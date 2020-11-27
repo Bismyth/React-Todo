@@ -1,4 +1,9 @@
-# Getting Started with Create React App
+# React Todo Project
+
+This is a simple project to learn how to use typescript with React.
+A live version can be found [here](https://todo.base67.com).
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
