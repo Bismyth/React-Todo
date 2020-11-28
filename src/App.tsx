@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {
     Container,
+    Input,
+    Label,
     ListGroup,
     ListGroupItem,
     ListGroupItemHeading,
@@ -26,21 +28,40 @@ const App = () => {
     );
     const [modalTask, setModalTask] = useState<task | undefined>(undefined);
     const [modal, setModal] = useState(false);
+    const [showCompleted, setShowCompleted] = useState(true);
     const toggle = (e?: React.MouseEvent<any, MouseEvent>, id?: string) => {
         if (id) setModalTask(data.filter((v) => v.id === id)[0]);
         setModal((v) => !v);
     };
+    const toggleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShowCompleted(event.target.checked);
+    };
     return (
         <Container>
             <div className="d-flex align-items-center">
-                <h1 className="mt-2 mb-4">Todo App</h1>
+                <h1 className="mt-2">Todo App</h1>
                 <span className="ml-auto">
                     <Add setData={setData} />
                 </span>
             </div>
-
+            <div className="ml-auto mb-4">
+                <Label check>
+                    <Input
+                        type="checkbox"
+                        className="ml-0 mr-2"
+                        checked={showCompleted}
+                        onChange={toggleCheck}
+                        style={{ position: "initial" }}
+                    />
+                    Show Completed Tasks
+                </Label>
+            </div>
             <ListGroup>
                 {data
+                    .filter((v) => {
+                        if (v.completed) return showCompleted;
+                        else return true;
+                    })
                     .sort((a, b) => +b.completed - +a.completed || a.name.localeCompare(b.name))
                     .map((v) => (
                         <ListGroupItem
