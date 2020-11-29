@@ -4,8 +4,12 @@ import dotenv from 'dotenv'
 
 const app = express()
 
+const webRoot = process.env.WEB_ROOT || path.join(__dirname, '../')
+
 //Initalise environment variables
-dotenv.config({ path: path.join(__dirname, '../.env') })
+dotenv.config({
+  path: path.join(webRoot, '.env')
+})
 
 //Body parser Middleware
 app.use(express.json())
@@ -15,10 +19,11 @@ app.get('/api/test', (req, res) => res.json({ msg: 'Test went good.' }))
 
 //Serve in Production
 if (process.env.NODE_ENV == 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')))
-  app.use('/assets', express.static(path.join(__dirname, '../assets')))
+  console.log('Starting in Produciton mode.')
+  app.use(express.static(path.join(webRoot, 'client/build')))
+  app.use('/assets', express.static(path.join(webRoot, 'assets')))
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '../client/build/index.html'))
+    res.sendFile(path.join(webRoot, 'client/build/index.html'))
   })
 }
 
