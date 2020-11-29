@@ -1,138 +1,35 @@
-import { useState } from 'react'
-import {
-  Container,
-  Input,
-  Label,
-  ListGroup,
-  ListGroupItem,
-  ListGroupItemHeading,
-  ListGroupItemText,
-  Modal,
-  ModalBody,
-  ModalHeader
-} from 'reactstrap'
-import { v4 as uuid } from 'uuid'
-import { task } from './Buttons/Types'
-import { useQuery } from 'react-query'
+import React from 'react'
+//import Todo from './components/Todo'
 import axios from 'axios'
-import initialData from './data.json'
+import { useQuery } from 'react-query'
+import { Container } from 'reactstrap'
+import { UserContext } from './Context'
 
-import Done from './Buttons/Done'
-import Delete from './Buttons/Delete'
-import Edit from './Buttons/Edit'
-import Add from './Buttons/Add'
+import Toolbar from './components/Toolbar'
 
-const App = () => {
-  const [data, setData] = useState(
-    initialData.map(v => {
-      return { ...v, id: uuid() }
-    })
+const App: React.FC = () => {
+  const { data: user } = useQuery(
+    'user',
+    async () => {
+      const result = await axios({
+        method: 'get',
+        url: '/api/auth/user'
+      })
+      return result.data.user
+    },
+    { retry: false }
   )
-  const { data: serverData, isLoading } = useQuery('test', async () => {
-    const { data } = await axios({
-      url: `/api/test`,
-      method: 'GET'
-    })
-    return data
-  })
-  const [modalTask, setModalTask] = useState<task | undefined>(undefined)
-  const [modal, setModal] = useState(false)
-  const [showCompleted, setShowCompleted] = useState(true)
-  const toggle = (e?: React.MouseEvent<any, MouseEvent>, id?: string) => {
-    if (id) setModalTask(data.filter(v => v.id === id)[0])
-    setModal(v => !v)
-  }
-  const toggleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setShowCompleted(event.target.checked)
-  }
   return (
-    <Container>
-      <div className='d-flex align-items-center'>
-        <h1 className='mt-2'>Todo App</h1>
-        <span className='ml-auto'>
-          <Add setData={setData} />
-        </span>
-      </div>
-      <div className='ml-auto mb-4'>
-        <Label check>
-          <Input
-            type='checkbox'
-            className='ml-0 mr-2'
-            checked={showCompleted}
-            onChange={toggleCheck}
-            style={{ position: 'initial' }}
-          />
-          Show Completed Tasks
-        </Label>
-      </div>
-      <div>{!isLoading ? <p>{serverData.msg}</p> : null}</div>
-      <ListGroup>
-        {data
-          .filter(v => {
-            if (v.completed) return showCompleted
-            else return true
-          })
-          .sort(
-            (a, b) =>
-              +b.completed - +a.completed || a.name.localeCompare(b.name)
-          )
-          .map(v => (
-            <ListGroupItem
-              key={v.id}
-              className='d-flex'
-              color={v.completed ? 'success' : ''}
-            >
-              <Done setData={setData} id={v.id} completed={v.completed} />
-              <a
-                href='#'
-                onClick={e => {
-                  toggle(e, v.id)
-                }}
-                className='text-dark'
-              >
-                {v.name}
-              </a>
-              <span className='ml-auto d-flex'>
-                <Edit setData={setData} task={v} />
-                <Delete setData={setData} id={v.id} />
-              </span>
-            </ListGroupItem>
-          ))}
-      </ListGroup>
-      <Modal isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>
-          {modalTask ? modalTask.name : ''}
-        </ModalHeader>
-        <ModalBody>
-          <ListGroup>
-            <ListGroupItem>
-              <ListGroupItemHeading>Description:</ListGroupItemHeading>
-              <ListGroupItemText>
-                {modalTask ? modalTask.description : ''}
-              </ListGroupItemText>
-            </ListGroupItem>
-            <ListGroupItem>
-              <ListGroupItemHeading>Date Created:</ListGroupItemHeading>
-              <ListGroupItemText>
-                {modalTask
-                  ? new Date(modalTask.dateCreated).toDateString()
-                  : ''}
-              </ListGroupItemText>
-            </ListGroupItem>
-            {modalTask && modalTask.completed ? (
-              <ListGroupItem>
-                <ListGroupItemHeading>Date Completed:</ListGroupItemHeading>
-                <ListGroupItemText>
-                  {modalTask
-                    ? new Date(modalTask.dateCompleted).toDateString()
-                    : ''}
-                </ListGroupItemText>
-              </ListGroupItem>
-            ) : null}
-          </ListGroup>
-        </ModalBody>
-      </Modal>
-    </Container>
+    <UserContext.Provider value={{ isAuthenticated: !!user, user }}>
+      <Toolbar />
+      <Container>
+        {!!user ? (
+          <div>
+            <h1>Hello {user.username}</h1>
+          </div>
+        ) : null}
+      </Container>
+    </UserContext.Provider>
   )
 }
 

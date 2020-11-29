@@ -1,5 +1,5 @@
-import { ReactComponent as DoneBtn } from '../icons/done-black-24dp.svg'
-import { setData } from './Types'
+import { ReactComponent as DoneBtn } from '../../icons/done-black-24dp.svg'
+import { setData } from '../Types'
 import './Button.css'
 
 type DoneProps = {

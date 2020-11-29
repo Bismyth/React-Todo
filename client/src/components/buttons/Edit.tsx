@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
-import { ReactComponent as EditBtn } from '../icons/edit-black-24dp.svg'
-import { setData, task } from './Types'
+import { ReactComponent as EditBtn } from '../../icons/edit-black-24dp.svg'
+import { setData, task } from '../Types'
 import FormModal from './FormModal'
 import './Button.css'
 

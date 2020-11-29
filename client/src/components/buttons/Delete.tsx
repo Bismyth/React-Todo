@@ -1,5 +1,5 @@
-import { ReactComponent as DeleteBtn } from '../icons/delete-black-24dp.svg'
-import { setData } from './Types'
+import { ReactComponent as DeleteBtn } from '../../icons/delete-black-24dp.svg'
+import { setData } from '../Types'
 import './Button.css'
 
 type DeleteProps = {

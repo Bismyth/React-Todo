@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
-import { ReactComponent as AddBtn } from '../icons/add_task-black-24dp.svg'
-import { setData } from './Types'
+import { ReactComponent as AddBtn } from '../../icons/add_task-black-24dp.svg'
+import { setData } from '../Types'
 import FormModal from './FormModal'
 import './Button.css'
 

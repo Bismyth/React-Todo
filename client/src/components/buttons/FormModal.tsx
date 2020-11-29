@@ -10,7 +10,7 @@ import {
 } from 'reactstrap'
 import { Formik, Field, Form, FormikHelpers, FieldProps } from 'formik'
 import { v4 as uuid } from 'uuid'
-import { setData } from './Types'
+import { setData } from '../Types'
 
 interface Values {
   name: string
