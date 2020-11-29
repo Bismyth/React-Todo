@@ -4,9 +4,8 @@ import dotenv from 'dotenv'
 
 const app = express()
 
-const webRoot = process.env.WEB_ROOT || path.join(__dirname, '../')
+const webRoot = path.join(process.cwd(), '../')
 console.log(webRoot)
-console.log(process.cwd())
 
 //Initalise environment variables
 dotenv.config({
