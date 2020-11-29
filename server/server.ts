@@ -2,10 +2,13 @@ import express from 'express'
 import path from 'path'
 import dotenv from 'dotenv'
 
-const app = express()
+const app: express.Application = express()
 
-const webRoot = path.join(process.cwd(), '../')
-console.log(webRoot)
+const webRoot: string = path.join(
+  __dirname,
+  __dirname.split('/').pop() === 'build' ? '../../' : '../'
+)
+console.log(`App root is: ${webRoot}`)
 
 //Initalise environment variables
 dotenv.config({
