@@ -1,8 +1,8 @@
 import express from 'express'
 import passport from 'passport'
-import User from '../models/user.model'
+import User from 'models/user.model'
 import bcrypt from 'bcryptjs'
-import isAuthenticated from '../middleware/auth'
+import isAuthenticated from 'middleware/auth'
 
 const router = express.Router()
 
@@ -21,19 +21,25 @@ router.post('/login', (req, res, next) => {
 
 router.post('/register', (req, res) => {
   User.findOne({ username: req.body.username }, async (err, doc) => {
-    if (err) console.error(err)
-    if (doc) res.status(422).json({ msg: 'Username is taken' })
+    if (err) throw err
+    if (doc) return res.status(422).json({ msg: 'Username is taken' })
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
 
     const newUser = new User({
       username: req.body.username,
       password: hashedPassword
     })
-    await newUser.save()
-    req.logIn(newUser, err => {
-      if (err) throw err
-      res.json({ msg: 'User Created', user: newUser })
-    })
+    newUser
+      .save()
+      .then(user => {
+        req.logIn(user, err => {
+          if (err) throw err
+          res.json({ msg: 'User Created', user })
+        })
+      })
+      .catch(err => {
+        throw err
+      })
   })
 })
 

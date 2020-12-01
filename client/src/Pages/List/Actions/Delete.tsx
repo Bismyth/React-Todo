@@ -1,23 +1,34 @@
 import { ReactComponent as DeleteBtn } from 'Icons/delete-black-24dp.svg'
-import { setData } from '../Types'
+import { queryCache, useMutation } from 'react-query'
+import axios from 'axios'
 import './Button.css'
 
 type DeleteProps = {
-  setData: setData
   id: string
+  listId: string
 }
 
-const Delete = ({ setData, id }: DeleteProps) => {
-  const deleteByID = (id: string) => {
-    setData(v => {
-      return v.filter(i => i.id !== id)
-    })
-  }
+const Delete: React.FC<DeleteProps> = ({ id, listId }) => {
+  const [deleteByID] = useMutation(
+    async () => {
+      const { data } = await axios({
+        method: 'delete',
+        url: `api/lists/${listId}`,
+        data: { id }
+      })
+      return data
+    },
+    {
+      onSuccess: () => {
+        queryCache.invalidateQueries('list')
+      }
+    }
+  )
   return (
     <DeleteBtn
       className='icon'
       onClick={() => {
-        deleteByID(id)
+        deleteByID()
       }}
     />
   )

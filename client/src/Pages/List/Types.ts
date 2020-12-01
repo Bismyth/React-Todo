@@ -1,10 +1,10 @@
 export type task = {
-  id: string
+  _id: string
   name: string
   description: string
-  dateCreated: number
+  dateCreated: Date
   completed: boolean
-  dateCompleted: number
+  dateCompleted?: Date
 }
 
 export type setData = React.Dispatch<React.SetStateAction<task[]>>

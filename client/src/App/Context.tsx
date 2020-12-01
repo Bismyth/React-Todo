@@ -2,12 +2,16 @@ import React from 'react'
 
 type User = {
   isAuthenticated: boolean
-  user: {
-    username: string
-  } | null
+  user:
+    | {
+        username: string
+      }
+    | undefined
+  authLoading: boolean
 }
 
 export const UserContext = React.createContext<User>({
   isAuthenticated: false,
-  user: null
+  user: undefined,
+  authLoading: false
 })

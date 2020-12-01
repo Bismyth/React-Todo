@@ -1,5 +1,5 @@
 import React from 'react'
-//import Todo from './components/Todo'
+
 import axios from 'axios'
 import { useQuery } from 'react-query'
 import { Container } from 'reactstrap'
@@ -9,7 +9,7 @@ import routes from 'router'
 import Toolbar from 'Components/Toolbar'
 
 const App: React.FC = () => {
-  const { data: user } = useQuery(
+  const { data: user, isLoading } = useQuery(
     'user',
     async () => {
       const result = await axios({
@@ -21,15 +21,19 @@ const App: React.FC = () => {
     { retry: false }
   )
   return (
-    <UserContext.Provider value={{ isAuthenticated: !!user, user }}>
-      <Toolbar />
-      <Container>
-        <Switch>
-          {routes.map(({ name, ...route }) => (
-            <Route key={name} {...route} />
-          ))}
-        </Switch>
-      </Container>
+    <UserContext.Provider
+      value={{ isAuthenticated: !!user, user, authLoading: isLoading && !user }}
+    >
+      <div className='App'>
+        <Toolbar />
+        <Container>
+          <Switch>
+            {routes.map(({ name, ...route }) => (
+              <Route key={name} {...route} />
+            ))}
+          </Switch>
+        </Container>
+      </div>
     </UserContext.Provider>
   )
 }

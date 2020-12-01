@@ -9,15 +9,14 @@ import {
   Button
 } from 'reactstrap'
 import { Formik, Field, Form, FormikHelpers, FieldProps } from 'formik'
-import { v4 as uuid } from 'uuid'
-import { setData } from '../Types'
+import { MutateFunction } from 'react-query'
 
 interface Values {
   name: string
   description: string
 }
 type FormModalProps = {
-  setData: setData
+  upload: MutateFunction<any, unknown, Values, unknown>
   toggle: () => void
   modal: boolean
   name: string
@@ -26,12 +25,11 @@ type FormModalProps = {
 }
 
 const FormModal = ({
-  setData,
+  upload,
   toggle,
   modal,
   name,
-  initialValues,
-  id
+  initialValues
 }: FormModalProps) => {
   return (
     <Modal isOpen={modal} toggle={toggle} unmountOnClose={true}>
@@ -39,34 +37,12 @@ const FormModal = ({
         initialValues={initialValues}
         onSubmit={(
           values: Values,
-          { setSubmitting, resetForm }: FormikHelpers<Values>
+          { setSubmitting }: FormikHelpers<Values>
         ) => {
-          console.log(values)
-          if (id) {
-            setData(v => {
-              console.log(v)
-              return v.map(i => {
-                if (i.id === id) {
-                  return { ...i, ...values }
-                } else {
-                  return i
-                }
-              })
-            })
-            resetForm()
-          } else {
-            const task = {
-              ...values,
-              id: uuid(),
-              dateCreated: Date.now(),
-              completed: false,
-              dateCompleted: 0
-            }
-            setData(v => [...v, task])
-            resetForm()
-          }
-          setSubmitting(false)
-          toggle()
+          upload(values).then(() => {
+            setSubmitting(false)
+            toggle()
+          })
         }}
       >
         {({ resetForm }: FormikHelpers<Values>) => (

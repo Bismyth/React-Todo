@@ -1,4 +1,4 @@
-import User from './models/user.model'
+import User from 'models/user.model'
 import bcrypt from 'bcryptjs'
 import { Strategy as localStrategy } from 'passport-local'
 import { PassportStatic } from 'passport'
@@ -25,7 +25,7 @@ export default (passport: PassportStatic) => {
   passport.deserializeUser((id, cb) => {
     User.findOne({ _id: id }, (err, user) => {
       if (!user) cb(err)
-      else cb(err, { username: user.username })
+      else cb(err, { id, username: user.username })
     })
   })
 }

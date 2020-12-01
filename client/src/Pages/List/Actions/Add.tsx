@@ -1,18 +1,39 @@
 import { Fragment, useState } from 'react'
 import { ReactComponent as AddBtn } from 'Icons/add_task-black-24dp.svg'
-import { setData } from '../Types'
 import FormModal from './FormModal'
 import './Button.css'
+import { queryCache, useMutation } from 'react-query'
+import axios from 'axios'
 
 type AddProps = {
-  setData: setData
+  listId: string
 }
 
-const Delete = ({ setData }: AddProps) => {
+type newTask = {
+  name: string
+  description: string
+}
+
+const Add = ({ listId }: AddProps) => {
   const [modal, setModal] = useState(false)
   const toggle = () => {
     setModal(v => !v)
   }
+  const [upload] = useMutation(
+    async (values: newTask) => {
+      const { data } = await axios({
+        method: 'post',
+        data: values,
+        url: `/api/lists/${listId}`
+      })
+      return data
+    },
+    {
+      onSuccess: () => {
+        queryCache.invalidateQueries('list')
+      }
+    }
+  )
   return (
     <Fragment>
       <AddBtn
@@ -21,7 +42,7 @@ const Delete = ({ setData }: AddProps) => {
         onClick={toggle}
       />
       <FormModal
-        setData={setData}
+        upload={upload}
         modal={modal}
         toggle={toggle}
         name='Add Task'
@@ -34,4 +55,4 @@ const Delete = ({ setData }: AddProps) => {
   )
 }
 
-export default Delete
+export default Add

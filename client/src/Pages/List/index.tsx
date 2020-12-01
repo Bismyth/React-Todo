@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   Container,
   Input,
@@ -10,94 +10,151 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Button
+  Button,
+  Spinner,
+  Nav,
+  NavItem,
+  NavLink,
+  Alert
 } from 'reactstrap'
-import { v4 as uuid } from 'uuid'
+
 import { task } from './Types'
 import { useQuery } from 'react-query'
 import axios from 'axios'
-import initialData from './data.json'
 
 import Done from './Actions/Done'
 import Delete from './Actions/Delete'
 import Edit from './Actions/Edit'
 import Add from './Actions/Add'
+import AddList from './Actions/AddList'
+import { UserContext } from 'App/Context'
+import { Redirect } from 'react-router-dom'
 
-const List = () => {
-  const [data, setData] = useState(
-    initialData.map(v => {
-      return { ...v, id: uuid() }
-    })
+type Lists = {
+  _id: string
+  name: string
+}
+
+const List: React.FC = () => {
+  const auth = useContext(UserContext)
+  const { data: lists, isLoading: listsLoading } = useQuery(
+    'lists',
+    async () => {
+      const { data } = await axios({ method: 'get', url: '/api/lists' })
+      return data
+    },
+    {
+      onSuccess: data => {
+        if (data.length === 0) setTab('')
+        else setTab(data[0]._id)
+      }
+    }
   )
-  const { data: serverData, isLoading } = useQuery('test', async () => {
-    const { data } = await axios({
-      url: `/api/test`,
-      method: 'GET'
-    })
-    return data
-  })
+  const [tab, setTab] = useState<string>('')
+
+  const { data, isLoading: listLoading } = useQuery(
+    ['list', { id: tab }],
+    async (key, { id }) => {
+      const { data } = await axios({ method: 'get', url: `/api/lists/${id}` })
+      return data
+    },
+    {
+      enabled: tab
+    }
+  )
+
   const [modalTask, setModalTask] = useState<task | undefined>(undefined)
   const [modal, setModal] = useState(false)
   const [showCompleted, setShowCompleted] = useState(true)
   const toggle = (e?: React.MouseEvent<any, MouseEvent>, id?: string) => {
-    if (id) setModalTask(data.filter(v => v.id === id)[0])
+    if (id) setModalTask(data.tasks.filter((v: task) => v._id === id)[0])
     setModal(v => !v)
+  }
+  const toggleTab = (id: string) => {
+    if (tab !== id) setTab(id)
   }
   const toggleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     setShowCompleted(event.target.checked)
   }
+  if (!auth.isAuthenticated && !auth.authLoading) return <Redirect to={'/'} />
+  if (auth.authLoading || listsLoading) return <Spinner color='primary' />
   return (
     <Container>
-      <div className='d-flex align-items-center'>
-        <h1 className='mt-2'>Todo App</h1>
-        <span className='ml-auto'>
-          <Add setData={setData} />
-        </span>
-      </div>
-      <div className='ml-auto mb-4'>
-        <Label check>
-          <Input
-            type='checkbox'
-            className='ml-0 mr-2'
-            checked={showCompleted}
-            onChange={toggleCheck}
-            style={{ position: 'initial' }}
-          />
-          Show Completed Tasks
-        </Label>
-      </div>
-      <div>{!isLoading ? <p>{serverData.msg}</p> : null}</div>
-      <ListGroup>
-        {data
-          .filter(v => {
-            if (v.completed) return showCompleted
-            else return true
-          })
-          .sort(
-            (a, b) =>
-              +b.completed - +a.completed || a.name.localeCompare(b.name)
-          )
-          .map(v => (
-            <ListGroupItem
-              key={v.id}
-              className='d-flex'
-              color={v.completed ? 'success' : ''}
+      <Nav tabs>
+        {lists.map(({ _id, name }: Lists) => (
+          <NavItem key={_id}>
+            <NavLink
+              className={tab === _id ? 'active' : ''}
+              onClick={() => {
+                toggleTab(_id)
+              }}
             >
-              <Done setData={setData} id={v.id} completed={v.completed} />
-              <Button
-                onClick={e => {
-                  toggle(e, v.id)
-                }}
-                className='text-dark'
-              >
-                {v.name}
-              </Button>
-              <span className='ml-auto d-flex'>
-                <Edit setData={setData} task={v} />
-                <Delete setData={setData} id={v.id} />
+              {name}
+            </NavLink>
+          </NavItem>
+        ))}
+        <AddList toggleTab={toggleTab} />
+      </Nav>
+
+      <ListGroup>
+        {listLoading ? (
+          <Spinner color='primary' />
+        ) : lists.length === 0 ? (
+          <Alert color='info'>
+            Press the add button at the top to add a list.
+          </Alert>
+        ) : !data ? (
+          <Alert color='danger'>List could not be loaded.</Alert>
+        ) : (
+          <>
+            <div className='d-flex align-items-center'>
+              <Add listId={data._id} />
+              <span className='ml-auto'>
+                <Label check>
+                  <Input
+                    type='checkbox'
+                    className='ml-0 mr-2'
+                    checked={showCompleted}
+                    onChange={toggleCheck}
+                    style={{ position: 'initial' }}
+                  />
+                  Show Completed Tasks
+                </Label>
               </span>
-            </ListGroupItem>
-          ))}
+            </div>
+            {data.tasks
+              .filter((v: task) => {
+                if (v.completed) return showCompleted
+                else return true
+              })
+              .sort(
+                (a: task, b: task) =>
+                  +b.completed - +a.completed || a.name.localeCompare(b.name)
+              )
+              .map((v: task) => (
+                <ListGroupItem
+                  key={v._id}
+                  className='d-flex'
+                  color={v.completed ? 'success' : ''}
+                >
+                  <Done listId={data._id} task={v} />
+                  <Button
+                    onClick={e => {
+                      toggle(e, v._id)
+                    }}
+                    className='text-dark p-0 ml-1'
+                    color='link'
+                  >
+                    {v.name}
+                  </Button>
+                  <span className='ml-auto d-flex'>
+                    <Edit listId={data._id} task={v} />
+                    <Delete id={v._id} listId={data._id} />
+                  </span>
+                </ListGroupItem>
+              ))}
+          </>
+        )}
       </ListGroup>
       <Modal isOpen={modal} toggle={toggle}>
         <ModalHeader toggle={toggle}>
@@ -123,7 +180,7 @@ const List = () => {
               <ListGroupItem>
                 <ListGroupItemHeading>Date Completed:</ListGroupItemHeading>
                 <ListGroupItemText>
-                  {modalTask
+                  {modalTask.dateCompleted
                     ? new Date(modalTask.dateCompleted).toDateString()
                     : ''}
                 </ListGroupItemText>

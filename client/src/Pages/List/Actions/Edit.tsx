@@ -1,24 +1,46 @@
 import { Fragment, useState } from 'react'
 import { ReactComponent as EditBtn } from 'Icons/edit-black-24dp.svg'
-import { setData, task } from '../Types'
+import { task } from '../Types'
 import FormModal from './FormModal'
 import './Button.css'
+import { queryCache, useMutation } from 'react-query'
+import axios from 'axios'
 
 type EditProps = {
-  setData: setData
+  listId: string
   task: task
 }
 
-const Delete = ({ setData, task }: EditProps) => {
+type newTask = {
+  name: string
+  description: string
+}
+
+const Delete: React.FC<EditProps> = ({ listId, task }) => {
   const [modal, setModal] = useState(false)
   const toggle = () => {
     setModal(!modal)
   }
+  const [upload] = useMutation(
+    async (values: newTask) => {
+      const { data } = await axios({
+        method: 'put',
+        data: { ...values, _id: task._id, type: 'edit' },
+        url: `/api/lists/${listId}`
+      })
+      return data
+    },
+    {
+      onSuccess: () => {
+        queryCache.invalidateQueries('list')
+      }
+    }
+  )
   return (
     <Fragment>
       <EditBtn className='icon mr-1' onClick={toggle} />
       <FormModal
-        setData={setData}
+        upload={upload}
         modal={modal}
         toggle={toggle}
         name='Edit Task'
@@ -26,7 +48,6 @@ const Delete = ({ setData, task }: EditProps) => {
           name: task.name,
           description: task.description
         }}
-        id={task.id}
       />
     </Fragment>
   )

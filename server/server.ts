@@ -10,8 +10,8 @@ import bodyParser from 'body-parser'
 import passportConfig from './passportConfig'
 import conMongo from 'connect-mongo'
 
-import auth from './routes/auth'
-import test from './routes/test'
+import auth from 'routes/auth'
+import lists from 'routes/lists'
 
 const app: express.Application = express()
 
@@ -66,7 +66,7 @@ passportConfig(passport)
 
 //Routes
 app.use('/api/auth', auth)
-app.use('/api/test', test)
+app.use('/api/lists', lists)
 
 //Serve in Production
 if (process.env.NODE_ENV == 'production') {
