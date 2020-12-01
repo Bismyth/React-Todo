@@ -10,8 +10,8 @@ import bodyParser from 'body-parser'
 import passportConfig from './passportConfig'
 import conMongo from 'connect-mongo'
 
-import auth from 'routes/auth'
-import lists from 'routes/lists'
+import auth from './routes/auth'
+import lists from './routes/lists'
 
 const app: express.Application = express()
 

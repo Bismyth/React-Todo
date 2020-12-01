@@ -1,5 +1,4 @@
 import express from 'express'
-import { Schema } from 'mongoose'
 
 const isAuthenticated = (
   req: express.Request,

@@ -1,7 +1,6 @@
 import express from 'express'
-import List, { IList, ITask } from 'models/list.model'
-import User from 'models/user.model'
-import isAuthenticated from 'middleware/auth'
+import List, { IList, ITask } from '../models/list.model'
+import isAuthenticated from '../middleware/auth'
 import { Schema, Types } from 'mongoose'
 
 const router = express.Router()

@@ -1,4 +1,4 @@
-import User from 'models/user.model'
+import User from './models/user.model'
 import bcrypt from 'bcryptjs'
 import { Strategy as localStrategy } from 'passport-local'
 import { PassportStatic } from 'passport'

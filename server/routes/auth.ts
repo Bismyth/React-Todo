@@ -1,8 +1,8 @@
 import express from 'express'
 import passport from 'passport'
-import User from 'models/user.model'
+import User from '../models/user.model'
 import bcrypt from 'bcryptjs'
-import isAuthenticated from 'middleware/auth'
+import isAuthenticated from '../middleware/auth'
 
 const router = express.Router()
 
