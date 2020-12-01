@@ -9,10 +9,10 @@ import {
   NavbarText,
   Container
 } from 'reactstrap'
-import { UserContext } from '../Context'
+import { UserContext } from 'App/Context'
 
-import Logout from './auth/Logout'
-import UserForm from './auth/UserForm'
+import Logout from './Links/Logout'
+import UserForm from './Links/UserForm'
 
 const Toolbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)

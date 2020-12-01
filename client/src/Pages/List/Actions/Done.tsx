@@ -1,4 +1,4 @@
-import { ReactComponent as DoneBtn } from '../../icons/done-black-24dp.svg'
+import { ReactComponent as DoneBtn } from 'Icons/done-black-24dp.svg'
 import { setData } from '../Types'
 import './Button.css'
 

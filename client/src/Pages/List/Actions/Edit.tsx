@@ -1,34 +1,32 @@
 import { Fragment, useState } from 'react'
-import { ReactComponent as AddBtn } from '../../icons/add_task-black-24dp.svg'
-import { setData } from '../Types'
+import { ReactComponent as EditBtn } from 'Icons/edit-black-24dp.svg'
+import { setData, task } from '../Types'
 import FormModal from './FormModal'
 import './Button.css'
 
-type AddProps = {
+type EditProps = {
   setData: setData
+  task: task
 }
 
-const Delete = ({ setData }: AddProps) => {
+const Delete = ({ setData, task }: EditProps) => {
   const [modal, setModal] = useState(false)
   const toggle = () => {
-    setModal(v => !v)
+    setModal(!modal)
   }
   return (
     <Fragment>
-      <AddBtn
-        className='icon'
-        style={{ height: '30px', width: '30px' }}
-        onClick={toggle}
-      />
+      <EditBtn className='icon mr-1' onClick={toggle} />
       <FormModal
         setData={setData}
         modal={modal}
         toggle={toggle}
-        name='Add Task'
+        name='Edit Task'
         initialValues={{
-          name: '',
-          description: ''
+          name: task.name,
+          description: task.description
         }}
+        id={task.id}
       />
     </Fragment>
   )

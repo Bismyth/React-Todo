@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   Container,
   Input,
@@ -9,7 +9,8 @@ import {
   ListGroupItemText,
   Modal,
   ModalBody,
-  ModalHeader
+  ModalHeader,
+  Button
 } from 'reactstrap'
 import { v4 as uuid } from 'uuid'
 import { task } from './Types'
@@ -17,12 +18,12 @@ import { useQuery } from 'react-query'
 import axios from 'axios'
 import initialData from './data.json'
 
-import Done from './buttons/Done'
-import Delete from './buttons/Delete'
-import Edit from './buttons/Edit'
-import Add from './buttons/Add'
+import Done from './Actions/Done'
+import Delete from './Actions/Delete'
+import Edit from './Actions/Edit'
+import Add from './Actions/Add'
 
-const Todo = () => {
+const List = () => {
   const [data, setData] = useState(
     initialData.map(v => {
       return { ...v, id: uuid() }
@@ -83,15 +84,14 @@ const Todo = () => {
               color={v.completed ? 'success' : ''}
             >
               <Done setData={setData} id={v.id} completed={v.completed} />
-              <a
-                href='#'
+              <Button
                 onClick={e => {
                   toggle(e, v.id)
                 }}
                 className='text-dark'
               >
                 {v.name}
-              </a>
+              </Button>
               <span className='ml-auto d-flex'>
                 <Edit setData={setData} task={v} />
                 <Delete setData={setData} id={v.id} />
@@ -136,4 +136,4 @@ const Todo = () => {
   )
 }
 
-export default Todo
+export default List

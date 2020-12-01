@@ -3,9 +3,10 @@ import React from 'react'
 import axios from 'axios'
 import { useQuery } from 'react-query'
 import { Container } from 'reactstrap'
-import { UserContext } from './Context'
-
-import Toolbar from './components/Toolbar'
+import { UserContext } from 'App/Context'
+import { Switch, Route } from 'react-router-dom'
+import routes from 'router'
+import Toolbar from 'Components/Toolbar'
 
 const App: React.FC = () => {
   const { data: user } = useQuery(
@@ -23,11 +24,11 @@ const App: React.FC = () => {
     <UserContext.Provider value={{ isAuthenticated: !!user, user }}>
       <Toolbar />
       <Container>
-        {!!user ? (
-          <div>
-            <h1>Hello {user.username}</h1>
-          </div>
-        ) : null}
+        <Switch>
+          {routes.map(({ name, ...route }) => (
+            <Route key={name} {...route} />
+          ))}
+        </Switch>
       </Container>
     </UserContext.Provider>
   )

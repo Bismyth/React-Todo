@@ -23,6 +23,7 @@ import {
   FormikState
 } from 'formik'
 import { User } from './user'
+import { useHistory } from 'react-router-dom'
 
 const initialValues = { username: '', password: '' }
 
@@ -33,6 +34,7 @@ type UserFormProps = {
 
 const UserForm: React.FC<UserFormProps> = ({ title, endpoint }) => {
   const [modal, setModal] = useState(false)
+  const history = useHistory()
   const toggle = () => {
     setModal(v => !v)
   }
@@ -67,7 +69,10 @@ const UserForm: React.FC<UserFormProps> = ({ title, endpoint }) => {
             { setSubmitting, setStatus }: FormikHelpers<User>
           ) => {
             login(values, {
-              onSuccess: () => setSubmitting(false),
+              onSuccess: () => {
+                setSubmitting(false)
+                history.push('/list')
+              },
               onError: err => {
                 const error = err as AxiosError
                 if (error !== undefined) {
